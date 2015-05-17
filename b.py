@@ -92,7 +92,6 @@ def group_products_on_corridor_edges(product):
     # select node which is closest to product and is neighbor of closest_node
     for neighbor in neighbors:
         temp_val = euclidean(R.node[neighbor], B.node[product])
-        print neighbor
 
         same_coord_to_change = R.node[closest_node][coordinate_to_change] ==\
             R.node[neighbor][coordinate_to_change]
@@ -131,6 +130,37 @@ def add_products_to_corridor(product):
         R.add_edge(previous, k[1], weight=euclidean(R.node[previous],
                                                     R.node[k[1]]))
 
+
+def get_direction_codes(nodes_list):
+    """
+    Codes:
+    1 up
+    2 down
+    3 right
+    4 left
+
+    Return list of directions, skip product nodes
+    """
+    directions = []
+    for index, node in enumerate(nodes_list):
+        # skip products
+        if node > 100:
+            continue
+        try:
+            next_node = nodes_list[index + 1]
+        except IndexError:
+            break
+        if R.node[node]['x'] == R.node[next_node]['x']:
+            if R.node[node]['y'] < R.node[next_node]['y']:
+                directions += [1]
+            else:
+                directions += [2]
+        elif R.node[node]['y'] == R.node[next_node]['y']:
+            if R.node[node]['x'] < R.node[next_node]['x']:
+                directions += [3]
+            else:
+                directions += [4]
+    return directions
 
 # Red graph
 R = nx.Graph()
@@ -227,6 +257,8 @@ print nx.shortest_path(R, 1, 2738, 'weight')
 print nx.shortest_path(R, 4, 2739, 'weight')
 print nx.shortest_path(R, 4, 2740, 'weight')
 print nx.shortest_path(R, 6, 2741, 'weight')
+l = nx.shortest_path(R, 4, 2739, 'weight')
+print get_direction_codes(l)
 
 with open('graf', 'w') as f:
     nx.write_gml(B, f)
